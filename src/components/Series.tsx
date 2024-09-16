@@ -1,5 +1,4 @@
 import React from "react";
-import { slug as slugger } from "github-slugger";
 import type { CollectionEntry } from "astro:content";
 
 interface SeriesProps {
@@ -19,6 +18,7 @@ const Series: React.FC<SeriesProps> = ({ series, currentSlug, posts }) => {
     posts.map(p => ({
       title: p.data?.title || p.frontmatter?.title || "Untitled",
       series: p.data?.series || p.frontmatter?.series,
+      slug: p.data?.slug || p.frontmatter?.slug || p.slug,
     }))
   );
   console.log("Current series:", series);
@@ -38,7 +38,10 @@ const Series: React.FC<SeriesProps> = ({ series, currentSlug, posts }) => {
 
   console.log(
     "Filtered series posts:",
-    seriesPosts.map(p => p.data?.title || p.frontmatter?.title || "Untitled")
+    seriesPosts.map(p => ({
+      title: p.data?.title || p.frontmatter?.title || "Untitled",
+      slug: p.data?.slug || p.frontmatter?.slug || p.slug,
+    }))
   );
   console.log("Number of posts in series:", seriesPosts.length);
 
@@ -54,13 +57,19 @@ const Series: React.FC<SeriesProps> = ({ series, currentSlug, posts }) => {
         {seriesPosts.map(post => {
           const postTitle =
             post.data?.title || post.frontmatter?.title || "Untitled";
+          const postSlug =
+            post.data?.slug || post.frontmatter?.slug || post.slug;
+          if (!postSlug) {
+            console.error("Post slug is undefined:", post);
+            return null;
+          }
           return (
-            <li key={post.slug} className="my-1">
-              {post.slug === currentSlug ? (
+            <li key={postSlug} className="my-1">
+              {postSlug === currentSlug ? (
                 <span className="font-bold">{postTitle}</span>
               ) : (
                 <a
-                  href={`/posts/${slugger(post.slug)}/`}
+                  href={`/posts/${postSlug}/`}
                   className="text-skin-accent hover:underline"
                 >
                   {postTitle}

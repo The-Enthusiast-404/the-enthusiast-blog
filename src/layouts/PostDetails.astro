@@ -24,13 +24,14 @@ const {
   modDatetime,
   tags,
   series,
+  slug,
 } = post.data || post.frontmatter || {};
 
 const { Content } = await post.render();
 
 const ogImageUrl = typeof ogImage === "string" ? ogImage : ogImage?.src;
 const ogUrl = new URL(
-  ogImageUrl ?? `/posts/${slugifyStr(title)}.png`,
+  ogImageUrl ?? `/posts/${slug || slugifyStr(title)}.png`,
   Astro.url.origin
 ).href;
 
@@ -38,8 +39,9 @@ const allPosts = await Astro.glob("../content/blog/*.md");
 console.log(
   "All posts:",
   allPosts.map(p => ({
-    title: p.frontmatter?.title || p.data?.title || "Untitled",
+    title: p.frontmatter?.title || p.data?.title,
     series: p.frontmatter?.series || p.data?.series,
+    slug: p.frontmatter?.slug || p.data?.slug || p.slug,
   }))
 );
 
@@ -47,11 +49,16 @@ const seriesPosts = allPosts.filter(p => {
   const postSeries = p.frontmatter?.series || p.data?.series;
   return postSeries?.name === series?.name;
 });
+
 console.log(
   "Filtered series posts:",
-  seriesPosts.map(p => p.frontmatter?.title || p.data?.title || "Untitled")
+  seriesPosts.map(p => ({
+    title: p.frontmatter?.title || p.data?.title,
+    slug: p.frontmatter?.slug || p.data?.slug || p.slug,
+  }))
 );
 console.log("Number of posts in series:", seriesPosts.length);
+console.log("Current post slug:", slug || post.slug);
 ---
 
 <Layout
@@ -86,7 +93,7 @@ console.log("Number of posts in series:", seriesPosts.length);
       series && seriesPosts.length > 1 && (
         <Series
           series={series}
-          currentSlug={post.slug}
+          currentSlug={slug || post.slug}
           posts={seriesPosts}
           client:load
         />
