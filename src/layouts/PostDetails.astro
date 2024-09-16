@@ -4,10 +4,9 @@ import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
 import Tag from "@components/Tag.astro";
 import Datetime from "@components/Datetime";
+import Series from "@components/Series";
 import type { CollectionEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
-import ShareLinks from "@components/ShareLinks.astro";
-import { SITE } from "@config";
 
 export interface Props {
   post: CollectionEntry<"blog">;
@@ -24,7 +23,8 @@ const {
   pubDatetime,
   modDatetime,
   tags,
-} = post.data;
+  series,
+} = post.data || post.frontmatter || {};
 
 const { Content } = await post.render();
 
@@ -34,25 +34,38 @@ const ogUrl = new URL(
   Astro.url.origin
 ).href;
 
-const layoutProps = {
-  title: `${title} | ${SITE.title}`,
-  author,
-  description,
-  pubDatetime,
-  modDatetime,
-  canonicalURL,
-  ogImage: ogUrl,
-  scrollSmooth: true,
-};
+const allPosts = await Astro.glob("../content/blog/*.md");
+console.log(
+  "All posts:",
+  allPosts.map(p => ({
+    title: p.frontmatter?.title || p.data?.title || "Untitled",
+    series: p.frontmatter?.series || p.data?.series,
+  }))
+);
+
+const seriesPosts = allPosts.filter(p => {
+  const postSeries = p.frontmatter?.series || p.data?.series;
+  return postSeries?.name === series?.name;
+});
+console.log(
+  "Filtered series posts:",
+  seriesPosts.map(p => p.frontmatter?.title || p.data?.title || "Untitled")
+);
+console.log("Number of posts in series:", seriesPosts.length);
 ---
 
-<Layout {...layoutProps}>
+<Layout
+  title={title}
+  author={author}
+  description={description}
+  ogImage={ogUrl}
+  canonicalURL={canonicalURL}
+>
   <Header />
-
   <div class="mx-auto flex w-full max-w-3xl justify-start px-2">
     <button
       class="focus-outline mb-2 mt-8 flex hover:opacity-75"
-      onclick="(() => (history.length === 1) ? window.location = '/' : history.back())()"
+      onclick="history.back()"
     >
       <svg xmlns="http://www.w3.org/2000/svg"
         ><path
@@ -69,31 +82,23 @@ const layoutProps = {
       size="lg"
       className="my-2"
     />
-    <article id="article" class="prose mx-auto mt-8 max-w-3xl">
+    {
+      series && seriesPosts.length > 1 && (
+        <Series
+          series={series}
+          currentSlug={post.slug}
+          posts={seriesPosts}
+          client:load
+        />
+      )
+    }
+    <article id="article" role="article" class="prose mx-auto mt-8 max-w-3xl">
       <Content />
     </article>
 
-    <ul class="my-8">
-      {tags.map(tag => <Tag tag={slugifyStr(tag)} />)}
+    <ul class="tags-container">
+      {tags && tags.map(tag => <Tag name={slugifyStr(tag)} />)}
     </ul>
-
-    <div
-      class="flex flex-col-reverse items-center justify-between gap-6 sm:flex-row-reverse sm:items-end sm:gap-4"
-    >
-      <button
-        id="back-to-top"
-        class="focus-outline whitespace-nowrap py-1 hover:opacity-75"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="rotate-90">
-          <path
-            d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
-          ></path>
-        </svg>
-        <span>Back to Top</span>
-      </button>
-
-      <ShareLinks />
-    </div>
   </main>
   <Footer />
 </Layout>
@@ -105,8 +110,10 @@ const layoutProps = {
   .post-title {
     @apply text-2xl font-semibold text-skin-accent;
   }
+  .tags-container {
+    @apply my-8;
+  }
 </style>
-
 <script is:inline>
   /** Create a progress indicator
    *  at the top */

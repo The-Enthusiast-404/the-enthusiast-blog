@@ -8,6 +8,9 @@ draft: false
 tags:
   - FAQ
 description: How to add a new social icon to AstroPaper
+series:
+  name: AstroPaper Guide
+  order: 1
 ---
 
 Hot new platform? Niche corner of the internet? Or one specific to your area? This post will guide you through how to add a new social icon to the theme.

@@ -22,6 +22,12 @@ const blog = defineCollection({
         .optional(),
       description: z.string(),
       canonicalURL: z.string().optional(),
+      series: z
+        .object({
+          name: z.string(),
+          order: z.number(),
+        })
+        .optional(),
     }),
 });
 
