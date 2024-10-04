@@ -1,0 +1,66 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@layouts/Layout.astro";
+import Header from "@components/Header.astro";
+import Footer from "@components/Footer.astro";
+import { SITE } from "@config";
+import type { CollectionEntry } from "astro:content";
+
+const posts = await getCollection("blog");
+
+const seriesMap = new Map<string, CollectionEntry<"blog">[]>();
+
+posts.forEach(post => {
+  if (post.data.series) {
+    const { name } = post.data.series;
+    if (!seriesMap.has(name)) {
+      seriesMap.set(name, []);
+    }
+    seriesMap.get(name)!.push(post);
+  }
+});
+
+const sortedSeries = Array.from(seriesMap.entries()).map(([name, posts]) => ({
+  name,
+  posts: posts.sort((a, b) => {
+    const orderA = a.data.series?.order ?? 0;
+    const orderB = b.data.series?.order ?? 0;
+    return orderA - orderB;
+  }),
+}));
+---
+
+<Layout title={`Series | ${SITE.title}`}>
+  <Header activeNav="posts" />
+  <main id="main-content">
+    <section id="series">
+      <h1 class="mb-6 text-2xl font-semibold">All Series</h1>
+      {
+        sortedSeries.map(series => (
+          <div class="mb-8">
+            <h2 class="mb-2 text-xl font-semibold">{series.name}</h2>
+            <ul class="list-inside list-decimal">
+              {series.posts.map((post: CollectionEntry<"blog">) => (
+                <li class="my-1">
+                  <a
+                    href={`/posts/${post.slug}/`}
+                    class="text-skin-accent hover:underline"
+                  >
+                    {post.data.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </section>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  #series {
+    @apply mx-auto w-full max-w-3xl px-4 pb-12;
+  }
+</style>
