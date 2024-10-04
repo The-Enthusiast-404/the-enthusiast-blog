@@ -1,11 +1,14 @@
 ---
+import { slugifyStr } from "@utils/slugify";
+
 export interface Props {
   name: string;
-  slug: string;
+  slug?: string;
   size?: "sm" | "lg";
 }
 
 const { name, slug, size = "sm" } = Astro.props;
+const tagSlug = slug || slugifyStr(name);
 ---
 
 <li
@@ -14,7 +17,7 @@ const { name, slug, size = "sm" } = Astro.props;
   }`}
 >
   <a
-    href={`/tags/${slug}/`}
+    href={`/tags/${tagSlug}/`}
     class={`${size === "sm" ? "text-sm" : "text-lg"} pr-2 group`}
   >
     <svg

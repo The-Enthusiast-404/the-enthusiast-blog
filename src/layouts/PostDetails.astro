@@ -5,12 +5,7 @@ import Footer from "@components/Footer.astro";
 import Tag from "@components/Tag.astro";
 import Datetime from "@components/Datetime";
 import Series from "@components/Series";
-import type { CollectionEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
-
-export interface Props {
-  post: CollectionEntry<"blog">;
-}
 
 const { post } = Astro.props;
 
@@ -24,41 +19,39 @@ const {
   modDatetime,
   tags,
   series,
-  slug,
 } = post.data;
 
 const { Content } = await post.render();
 
 const ogImageUrl = typeof ogImage === "string" ? ogImage : ogImage?.src;
-const ogUrl = new URL(
-  ogImageUrl ?? `/posts/${slug || slugifyStr(title)}.png`,
-  Astro.url.origin
-).href;
+const ogUrl = new URL(ogImageUrl ?? `/posts/${post.slug}.png`, Astro.url.origin)
+  .href;
 
 const allPosts = await Astro.glob("../content/blog/*.md");
-console.log(
-  "All posts:",
-  allPosts.map(p => ({
-    title: p.frontmatter?.title || p.data?.title,
-    series: p.frontmatter?.series || p.data?.series,
-    slug: p.frontmatter?.slug || p.data?.slug || p.slug,
-  }))
-);
 
-const seriesPosts = allPosts.filter(p => {
-  const postSeries = p.frontmatter?.series || p.data?.series;
-  return postSeries?.name === series?.name;
-});
+interface SeriesPost {
+  frontmatter: {
+    title: string;
+    series?: {
+      name: string;
+      order: number;
+    };
+  };
+  slug: string;
+}
 
-console.log(
-  "Filtered series posts:",
-  seriesPosts.map(p => ({
-    title: p.frontmatter?.title || p.data?.title,
-    slug: p.frontmatter?.slug || p.data?.slug || p.slug,
-  }))
-);
-console.log("Number of posts in series:", seriesPosts.length);
-console.log("Current post slug:", slug || post.slug);
+const seriesPosts = allPosts
+  .filter(p => p.frontmatter.series?.name === series?.name)
+  .map(p => ({
+    frontmatter: {
+      title: p.frontmatter.title,
+      series: p.frontmatter.series,
+    },
+    slug:
+      (p.url?.split("/").pop() ||
+        p.file.split("/").pop()?.replace(/\.md$/, "")) ??
+      "",
+  })) as SeriesPost[];
 ---
 
 <Layout
@@ -93,7 +86,7 @@ console.log("Current post slug:", slug || post.slug);
       series && seriesPosts.length > 1 && (
         <Series
           series={series}
-          currentSlug={slug || post.slug}
+          currentSlug={post.slug}
           posts={seriesPosts}
           client:load
         />
@@ -106,7 +99,7 @@ console.log("Current post slug:", slug || post.slug);
     {
       tags && tags.length > 0 && (
         <ul class="tags-container">
-          {tags.map(tag => (
+          {(tags as string[]).map((tag: string) => (
             <Tag name={tag} slug={slugifyStr(tag)} />
           ))}
         </ul>
@@ -127,6 +120,8 @@ console.log("Current post slug:", slug || post.slug);
     @apply my-8;
   }
 </style>
+
+<!-- Your inline scripts here -->
 <script is:inline>
   /** Create a progress indicator
    *  at the top */
