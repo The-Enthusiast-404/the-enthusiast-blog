@@ -1,13 +1,14 @@
 import { slugifyStr } from "./slugify";
 import type { CollectionEntry } from "astro:content";
-import postFilter from "./postFilter";
 
 const getUniqueTags = (posts: CollectionEntry<"blog">[]) => {
-  const filteredPosts = posts.filter(postFilter);
-  const tags: string[] = filteredPosts
-    .flatMap(post => post.data.tags)
-    .map(tag => tag.toLowerCase());
-  const uniqueTags = [...new Set(tags)];
+  const tags = posts.flatMap(post => post.data.tags);
+  const uniqueTags = [...new Set(tags.map(tag => tag.toLowerCase()))].map(
+    tag => ({
+      tag: slugifyStr(tag),
+      tagName: tag,
+    })
+  );
   return uniqueTags;
 };
 

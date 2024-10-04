@@ -25,7 +25,7 @@ const {
   tags,
   series,
   slug,
-} = post.data || post.frontmatter || {};
+} = post.data;
 
 const { Content } = await post.render();
 
@@ -107,7 +107,7 @@ console.log("Current post slug:", slug || post.slug);
       tags && tags.length > 0 && (
         <ul class="tags-container">
           {tags.map(tag => (
-            <Tag name={tag.toString()} />
+            <Tag name={tag} slug={slugifyStr(tag)} />
           ))}
         </ul>
       )
