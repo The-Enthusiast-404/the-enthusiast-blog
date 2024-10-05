@@ -15,6 +15,8 @@ series:
   order: 1
 ---
 
+![Linux Terminal for Beginners - Mastering Navigation Basics](/assets/terminal-introduction.png)
+
 Imagine this: You've been using your computer for a while, and your Documents folder has become a catch-all for every file you've saved. You want to bring some order to this chaos, create a structure for your projects, and set up a system for personal files. Doing this with a mouse seems tedious. There must be a faster, more efficient way, right?
 
 Enter the terminal --> your new friend for doing things faster. Before we start organizing, we need to learn how to navigate our digital space efficiently. This is where the power of the terminal really shines.
