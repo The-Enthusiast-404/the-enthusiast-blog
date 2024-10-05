@@ -1,8 +1,8 @@
 ---
 author: Sahil
 pubDatetime: 2024-10-04T16:26:22.274Z
-title: Introduction to Linux Terminal
-slug: introduction-to-linux-terminal
+title: Linux Terminal for Beginners - Mastering Navigation Basics
+slug: linux-terminal-for-beginners-mastering-navigation-basics
 ogImage: "/assets/terminal-introduction.png"
 featured: true
 draft: false

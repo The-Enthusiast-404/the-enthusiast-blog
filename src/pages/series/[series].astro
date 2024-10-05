@@ -1,0 +1,62 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@layouts/Layout.astro";
+import Header from "@components/Header.astro";
+import Footer from "@components/Footer.astro";
+import Card from "@components/Card";
+import { SITE } from "@config";
+import { slugifyStr } from "@utils/slugify";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  const seriesSet = new Set(
+    posts.map(post => post.data.series?.name).filter(Boolean)
+  );
+
+  return Array.from(seriesSet).map(seriesName => ({
+    params: { series: slugifyStr(seriesName || "") },
+    props: { seriesName },
+  }));
+}
+
+const { seriesName } = Astro.props;
+const posts = await getCollection("blog");
+const seriesPosts = posts
+  .filter(post => post.data.series?.name === seriesName)
+  .sort((a, b) => a.data.series!.order - b.data.series!.order);
+
+const ogImage = seriesPosts[0]?.data.ogImage;
+const ogImageUrl = typeof ogImage === "string" ? ogImage : ogImage?.src;
+---
+
+<Layout title={`${seriesName} Series | ${SITE.title}`} ogImage={ogImageUrl}>
+  <Header activeNav="series" />
+  <main id="main-content">
+    <section id="series">
+      <h1 class="text-2xl font-semibold text-skin-accent">
+        {seriesName} Series
+      </h1>
+      <p class="mt-2 text-skin-base">
+        This series contains {seriesPosts.length} posts
+      </p>
+      <ul class="mt-4 space-y-4">
+        {
+          seriesPosts.map(post => (
+            <Card
+              href={`/posts/${post.slug}/`}
+              frontmatter={post.data}
+              secHeading={false}
+            />
+          ))
+        }
+      </ul>
+    </section>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  #series {
+    @apply mx-auto max-w-3xl px-4 py-6;
+  }
+</style>

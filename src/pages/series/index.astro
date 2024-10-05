@@ -1,0 +1,72 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@layouts/Layout.astro";
+import Header from "@components/Header.astro";
+import Footer from "@components/Footer.astro";
+import { SITE } from "@config";
+
+const posts = await getCollection("blog");
+
+const seriesMap = posts.reduce((acc, post) => {
+  if (post.data.series) {
+    const { name, order } = post.data.series;
+    if (!acc.has(name)) {
+      acc.set(name, []);
+    }
+    acc.get(name)!.push({ ...post, seriesOrder: order });
+  }
+  return acc;
+}, new Map<string, any[]>());
+
+const seriesData = Array.from(seriesMap.entries()).map(([name, posts]) => {
+  const sortedPosts = posts.sort((a, b) => a.seriesOrder - b.seriesOrder);
+  const firstPost = sortedPosts[0];
+  return {
+    name,
+    slug: name.toLowerCase().replace(/\s+/g, "-"),
+    image: firstPost.data.ogImage,
+    description: `A series of ${posts.length} posts`,
+    postCount: posts.length,
+  };
+});
+---
+
+<Layout title={`Series | ${SITE.title}`}>
+  <Header activeNav="series" />
+  <main id="main-content">
+    <section id="series">
+      <h1 class="text-2xl font-semibold text-skin-accent">Series</h1>
+      <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {
+          seriesData.map(series => (
+            <li class="overflow-hidden rounded-lg bg-skin-card shadow-md transition-shadow duration-200 hover:shadow-lg">
+              <a
+                href={`/series/${series.slug}`}
+                class="flex h-full flex-col p-4"
+              >
+                <img
+                  src={series.image}
+                  alt={`Cover image for ${series.name} series`}
+                  class="mb-4 h-40 w-full rounded object-cover"
+                />
+                <h2 class="mb-2 text-xl font-bold text-skin-accent">
+                  {series.name}
+                </h2>
+                <p class="mt-auto text-skin-base">
+                  {series.postCount} posts in this series
+                </p>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  #series {
+    @apply mx-auto max-w-3xl px-4 py-6;
+  }
+</style>

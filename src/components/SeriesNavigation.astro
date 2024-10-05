@@ -1,0 +1,66 @@
+---
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  currentSlug: string;
+  series: {
+    name: string;
+    order: number;
+  };
+}
+
+const { currentSlug, series } = Astro.props;
+
+const posts = await getCollection("blog", ({ data }) => {
+  return data.series?.name === series.name && !data.draft;
+});
+
+const sortedPosts = posts.sort(
+  (a, b) => a.data.series!.order - b.data.series!.order
+);
+
+const currentIndex = sortedPosts.findIndex(post => post.slug === currentSlug);
+const prevPost = sortedPosts[currentIndex - 1];
+const nextPost = sortedPosts[currentIndex + 1];
+---
+
+<nav class="series-nav">
+  <h2>{series.name}</h2>
+  <ol>
+    {
+      sortedPosts.map((post, index) => (
+        <li>
+          {post.slug === currentSlug ? (
+            <strong>{post.data.title}</strong>
+          ) : (
+            <a href={`/posts/${post.slug}/`}>{post.data.title}</a>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+  <div class="series-nav-links">
+    {
+      prevPost && (
+        <a href={`/posts/${prevPost.slug}/`}>&larr; Previous in series</a>
+      )
+    }
+    {nextPost && <a href={`/posts/${nextPost.slug}/`}>Next in series &rarr;</a>}
+  </div>
+</nav>
+
+<style>
+  .series-nav {
+    @apply my-8 rounded-lg bg-skin-card p-4;
+  }
+  .series-nav h2 {
+    @apply mb-4 text-xl font-bold;
+  }
+  .series-nav ol {
+    @apply mb-4 list-inside list-decimal;
+  }
+  .series-nav-links {
+    @apply flex justify-between;
+  }
+</style>
