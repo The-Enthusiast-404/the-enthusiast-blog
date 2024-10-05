@@ -7,6 +7,7 @@ import Datetime from "@components/Datetime";
 import Series from "@components/Series";
 import { slugifyStr } from "@utils/slugify";
 import ShareLinks from "@components/ShareLinks.astro";
+import { SITE } from "@config";
 
 const { post } = Astro.props;
 
@@ -64,6 +65,14 @@ const seriesPosts = allPosts
   ogImage={ogUrl}
   canonicalURL={canonicalURL}
 >
+  <Fragment slot="head">
+    <!-- Twitter Card data -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content={SITE.twitterHandle} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+  </Fragment>
   <Header />
   <div class="mx-auto flex w-full max-w-3xl justify-start px-2">
     <button

@@ -10,6 +10,7 @@ export const SITE: Site = {
   lightAndDarkMode: true,
   postPerIndex: 4,
   postPerPage: 3,
+  twitterHandle: "@introvertedbot",
   scheduledPostMargin: 15 * 60 * 1000, // 15 minutes
 };
 
