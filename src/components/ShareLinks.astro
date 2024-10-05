@@ -39,6 +39,16 @@ const shareLinks = [
     linkTitle: `Share this post on Pinterest`,
   },
   {
+    name: "LinkedIn",
+    href: `https://www.linkedin.com/shareArticle?mini=true&url=${encodedUrl}&title=${encodedText}&summary=${encodedText}&source=${encodedUrl}`,
+    linkTitle: `Share this post on LinkedIn`,
+  },
+  {
+    name: "Reddit",
+    href: `https://reddit.com/submit?url=${encodedUrl}&title=${encodedText}`,
+    linkTitle: `Share this post on Reddit`,
+  },
+  {
     name: "Mail",
     href: `mailto:?subject=${encodedText}&body=${encodedUrl}`,
     linkTitle: `Share this post via email`,
