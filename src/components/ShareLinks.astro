@@ -2,37 +2,45 @@
 import LinkButton from "./LinkButton.astro";
 import socialIcons from "@assets/socialIcons";
 
-const URL = Astro.url;
+export interface Props {
+  url: string;
+  text: string;
+}
+
+const { url, text } = Astro.props;
+
+const encodedUrl = encodeURIComponent(url);
+const encodedText = encodeURIComponent(text);
 
 const shareLinks = [
   {
     name: "WhatsApp",
-    href: "https://wa.me/?text=",
+    href: `https://wa.me/?text=${encodedText}%20${encodedUrl}`,
     linkTitle: `Share this post via WhatsApp`,
   },
   {
     name: "Facebook",
-    href: "https://www.facebook.com/sharer.php?u=",
+    href: `https://www.facebook.com/sharer.php?u=${encodedUrl}`,
     linkTitle: `Share this post on Facebook`,
   },
   {
     name: "Twitter",
-    href: "https://twitter.com/intent/tweet?url=",
+    href: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`,
     linkTitle: `Tweet this post`,
   },
   {
     name: "Telegram",
-    href: "https://t.me/share/url?url=",
+    href: `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`,
     linkTitle: `Share this post via Telegram`,
   },
   {
     name: "Pinterest",
-    href: "https://pinterest.com/pin/create/button/?url=",
+    href: `https://pinterest.com/pin/create/button/?url=${encodedUrl}&description=${encodedText}`,
     linkTitle: `Share this post on Pinterest`,
   },
   {
     name: "Mail",
-    href: "mailto:?subject=See%20this%20post&body=",
+    href: `mailto:?subject=${encodedText}&body=${encodedUrl}`,
     linkTitle: `Share this post via email`,
   },
 ] as const;
@@ -44,7 +52,7 @@ const shareLinks = [
     {
       shareLinks.map(social => (
         <LinkButton
-          href={`${social.href + URL}`}
+          href={social.href}
           className="link-button"
           title={social.linkTitle}
         >

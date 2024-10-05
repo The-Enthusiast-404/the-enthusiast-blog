@@ -6,6 +6,7 @@ import Tag from "@components/Tag.astro";
 import Datetime from "@components/Datetime";
 import Series from "@components/Series";
 import { slugifyStr } from "@utils/slugify";
+import ShareLinks from "@components/ShareLinks.astro";
 
 const { post } = Astro.props;
 
@@ -26,6 +27,8 @@ const { Content } = await post.render();
 const ogImageUrl = typeof ogImage === "string" ? ogImage : ogImage?.src;
 const ogUrl = new URL(ogImageUrl ?? `/posts/${post.slug}.png`, Astro.url.origin)
   .href;
+
+const postUrl = new URL(Astro.url.pathname, Astro.url.origin).href;
 
 const allPosts = await Astro.glob("../content/blog/*.md");
 
@@ -95,6 +98,8 @@ const seriesPosts = allPosts
     <article id="article" role="article" class="prose mx-auto mt-8 max-w-3xl">
       <Content />
     </article>
+
+    <ShareLinks url={postUrl} text={title} />
 
     {
       tags && tags.length > 0 && (
