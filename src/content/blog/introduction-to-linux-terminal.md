@@ -3,7 +3,7 @@ author: Sahil
 pubDatetime: 2024-10-04T16:26:22.274Z
 title: Introduction to Linux Terminal
 slug: introduction-to-linux-terminal
-ogImage: "/assets/Designer.jpeg"
+ogImage: "/assets/terminal-introduction.png"
 featured: true
 draft: false
 tags:
