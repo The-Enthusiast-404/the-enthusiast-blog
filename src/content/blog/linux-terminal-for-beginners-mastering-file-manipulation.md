@@ -1,6 +1,6 @@
 ---
 author: Sahil
-pubDatetime: 2024-10-09T11:36:10.094Z
+pubDatetime: 2024-01-15T14:30:00Z
 title: Linux Terminal for Beginners - Mastering File Manipulation
 slug: linux-terminal-for-beginners-mastering-file-manipulation
 ogImage: "/assets/terminal-2.png"
