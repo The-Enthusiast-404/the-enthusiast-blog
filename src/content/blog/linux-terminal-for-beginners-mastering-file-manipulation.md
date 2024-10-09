@@ -1,6 +1,6 @@
 ---
 author: Sahil
-pubDatetime: 2024-01-15T14:30:00Z
+pubDatetime: 2024-10-9T14:30:00Z
 title: Linux Terminal for Beginners - Mastering File Manipulation
 slug: linux-terminal-for-beginners-mastering-file-manipulation
 ogImage: "/assets/terminal-2.png"
@@ -9,7 +9,7 @@ draft: false
 tags:
   - terminal
   - linux
-description: Learn how to navigate your digital space efficiently using the Linux terminal. Master the basics of terminal navigation with this beginner-friendly guide.
+description: Learn how to manipulate files using the Linux terminal. Master file creation, moving, copying, and renaming with this beginner-friendly guide.
 series:
   name: Linux Terminal
   order: 2
