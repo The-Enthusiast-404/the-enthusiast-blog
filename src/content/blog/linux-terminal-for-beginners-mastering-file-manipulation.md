@@ -277,25 +277,210 @@ Let's practice renaming files with the `mv` command:
 ![mv-ls.png](@assets/images/terminal/file-manipulation/mv-ls.png)
 Remember, when renaming files with `mv`, you're essentially "moving" the file to a new name in the same directory. Be careful not to accidentally move the file to a different directory by specifying a path in the new name.
 
+## Deleting Files and Directories: Cleaning Up Your Workspace
+As you organize your digital space, you'll often need to remove files or directories that are no longer needed. Linux provides several commands for this purpose, but it's crucial to use them carefully as deleted items cannot be easily recovered.
+
+### Removing Files with rm
+The `rm` command (short for "remove") is used to delete files. Its basic syntax is:
+```bash
+rm filename
+```
+
+Let's practice using the `rm` command:
+1. Navigate to the Documents folder:
+```bash
+cd ~/terminal_practice/Documents
+```
+
+2. Create a test file:
+```bash
+touch test_file.txt
+```
+
+3. Verify the file was created:
+```bash
+ls
+```
+![rm-touch-test-file.png](@assets/images/terminal/file-manipulation/rm-touch-test-file.png)
+You should see "test_file.txt" listed
+
+4. Now, let's delete the file:
+```bash
+rm test_file.txt
+```
+![rm-test-file.png](@assets/images/terminal/file-manipulation/rm-test-file.png)
+5. Verify the file was deleted:
+```bash
+ls
+```
+
+"test_file.txt" should no longer be listed.
+
+## Removing Empty Directories with rmdir
+To remove an empty directory, use the `rmdir` command:
+```bash
+rmdir directory_name
+```
+
+Let's try it out:
+1. Create a new directory:
+```bash
+mkdir empty_folder
+```
+![rmdir-mkdir.png](@assets/images/terminal/file-manipulation/rmdir-mkdir.png)
+2. Now, remove it:
+```bash
+rmdir empty_folder
+```
+![rmdir-empty-folder.png](@assets/images/terminal/file-manipulation/rmdir-empty-folder.png)
+3. Verify it's gone:
+```bash
+ls
+```
+
+> Note: `rmdir` only works on empty directories. If the directory contains files or other directories, you'll need to use `rm -r` instead.
+
+## Removing Non-Empty Directories with rm -r
+To remove a directory and all its contents, use `rm` with the `-r` (recursive) flag:
+```bash
+rm -r directory_name
+```
+
+Let's practice:
+1. Create a directory with a file in it:
+```bash
+mkdir test_dir
+touch test_dir/file.txt
+```
+![rm-r-touch.png](@assets/images/terminal/file-manipulation/rm-r-touch.png)
+2. Now, remove the directory and its contents:
+```bash
+rm -r test_dir
+```
+![rm-r-test-dir.png](@assets/images/terminal/file-manipulation/rm-r-test-dir.png)
+3. Verify it's gone:
+```bash
+ls
+```
+
+## Safety Precautions: The -i Flag
+When deleting files or directories, it's easy to accidentally remove something important. To add a layer of protection, you can use the `-i` (interactive) flag, which will prompt you for confirmation before each deletion:
+
+```bash
+rm -i filename
+rm -ri directory_name
+```
+
+For example:
+```bash
+touch important_file.txt
+rm -i important_file.txt
+```
+
+This will prompt you with "rm: remove regular empty file 'important_file.txt'?". You'll need to respond with 'y' to confirm deletion.
+
+Remember, in Linux, deletion is typically permanent. There's no Recycle Bin or Trash to recover from, so always double-check before deleting!
+
+## Directory Manipulation: Mastering Folder Management
+We've already learned how to create basic directories with `mkdir`, but let's explore some more advanced directory operations.
+
+### Creating Nested Directories with mkdir -p
+
+The `-p` flag allows you to create parent directories as needed. This is useful for creating a whole directory structure in one command:
+
+```bash
+mkdir -p parent_dir/child_dir/grandchild_dir
+```
+
+Let's try it:
+
+1. Navigate you Projects directory:
+```bash
+cd ../Projects
+```
+![nested-directories.png](@assets/images/terminal/file-manipulation/nested-directories.png)
+2. Create Nested Directories:
+```bash
+mkdir -p Projects/WebDev/css
+ls Projects
+ls Projects/WebDev
+```
+![ls-nested-directories.png](@assets/images/terminal/file-manipulation/ls-nested-directories.png)
+
+This creates a "WebDev" directory inside "Projects", and a "css" directory inside "WebDev", all in one command.
+
+### Moving Directories with `mv`
+Just like with files, you can use `mv` to move entire directories:
+```bash
+mv source_directory destination_directory
+```
+
+Let's practice:
+1. Create a test directory:
+```bash
+mkdir test_move
+```
+![mkdir-test-move.png](@assets/images/terminal/file-manipulation/mkdir-test-move.png)
+2. Move it into the Projects directory:
+```bash
+mv test_move Projects/
+```
+![mv-test-projects.png](@assets/images/terminal/file-manipulation/mv-test-projects.png)
+3. Verify the move:
+```bash
+ls Projects
+```
+You should see "test_move" listed under Projects.
+![mv-test-move.png](@assets/images/terminal/file-manipulation/mv-test-move.png)
+### Copying Directories with `cp -r`
+To copy a directory and all its contents, use `cp` with the `-r` flag:
+```bash
+cp -r source_directory destination_directory
+```
+
+Let's try it:
+1. Copy the WebDev directory:
+```bash
+cp -r Projects/WebDev Projects/WebDev_backup
+```
+![cp-webdev.png](@assets/images/terminal/file-manipulation/cp-webdev.png)
+
+2. Verify the copy:
+```bash
+ls Projects
+```
+You should now see both "WebDev" and "WebDev_backup"
+![cp-ls-projects.png](@assets/images/terminal/file-manipulation/cp-ls-projects.png)
+
 ## Practice Mission: Organizing Your Digital Space
 
-Now, let's practice what we've learned:
+Let's put all these skills together:
 
-1. Navigate to the Projects folder and create a new file
-2. Make a copy of this file in Documents
-3. Move to Documents and rename the copy
-4. Move the original file from Projects to Personal
-5. Check the contents of all directories
+1. Navigate to the terminal_practice directory
+2. Create a new directory structure: Projects/PythonDev/scripts
+3. Create a file named "hello_world.py" in the scripts directory
+4. Copy the entire PythonDev directory to a new directory named PythonDev_backup
+5. Move the PythonDev_backup directory into the Documents directory
+6. Delete the original PythonDev directory from Projects
+7. Use `ls` after each step to verify your actions
 
 ## Wrapping Up
 
-Congratulations! You've just learned some powerful file management skills:
+Congratulations! You've just expanded your file management toolkit with some powerful new skills:
+
 - Using `..` to navigate up directories
 - `touch`: Create empty files
-- `mv`: Move or rename files
-- `cp`: Copy files
+- `mv`: Move or rename files and directories
+- `cp`: Copy files and directories
+- `rm`: Remove files and non-empty directories
+- `rmdir`: Remove empty directories
+- `mkdir -p`: Create nested directory structures
 
-Remember, practice makes perfect. Try using these commands to organize some of your own files. Start small and gradually work your way up to larger organizations.
+These commands form the backbone of file and directory manipulation in Linux. With practice, you'll be able to efficiently organize and manage your digital workspace entirely from the command line.
+
+Remember, the power of these commands also means they can be destructive if used carelessly. Always double-check your commands, especially when using `rm`, and consider using the `-i` flag for an extra layer of safety.
+
+In our next lesson, we'll dive into text processing and output redirection, opening up even more possibilities for working with your files and data in the terminal.
 
 If you found yourself enjoying working in the terminal today, you might want to give Warp a try. Its modern interface and helpful features like auto-suggestions and clear output formatting can make your terminal experience even more enjoyable and productive. And remember, it's completely free to use! You can [download Warp here](https://app.warp.dev/referral/REZXZL) if you're interested in enhancing your terminal experience.
 
