@@ -1,6 +1,6 @@
 ---
 author: Sahil
-pubDatetime: 2024-10-8T14:30:00Z
+pubDatetime: 2024-13-8T14:30:00Z
 title: Linux Terminal for Beginners - Mastering Text Processing
 slug: linux-terminal-for-beginners-mastering-text-processing
 ogImage: "/assets/text-processing.png"
