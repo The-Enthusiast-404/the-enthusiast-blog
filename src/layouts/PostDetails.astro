@@ -4,10 +4,15 @@ import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
 import Tag from "@components/Tag.astro";
 import Datetime from "@components/Datetime";
-import Series from "@components/Series";
+import type { CollectionEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
 import ShareLinks from "@components/ShareLinks.astro";
 import { SITE } from "@config";
+import { getCollection } from "astro:content";
+
+export interface Props {
+  post: CollectionEntry<"blog">;
+}
 
 const { post } = Astro.props;
 
@@ -26,36 +31,34 @@ const {
 const { Content } = await post.render();
 
 const ogImageUrl = typeof ogImage === "string" ? ogImage : ogImage?.src;
-const ogUrl = new URL(ogImageUrl ?? `/posts/${post.slug}.png`, Astro.url.origin)
-  .href;
+const ogUrl = new URL(
+  ogImageUrl ?? `/posts/${slugifyStr(title)}.png`,
+  Astro.url.origin
+).href;
 
 const postUrl = new URL(Astro.url.pathname, Astro.url.origin).href;
 
-const allPosts = await Astro.glob("../content/blog/*.md");
+const allPosts = await getCollection("blog", ({ data }) => !data.draft);
 
-interface SeriesPost {
-  frontmatter: {
-    title: string;
-    series?: {
-      name: string;
-      order: number;
-    };
-  };
-  slug: string;
+const getPostsBySeriesName = (
+  allPosts: CollectionEntry<"blog">[],
+  seriesName: string
+) => allPosts.filter(post => post.data.series?.name === seriesName);
+
+let seriesPosts: CollectionEntry<"blog">[] = [];
+if (series) {
+  seriesPosts = getPostsBySeriesName(allPosts, series.name).sort(
+    (a, b) => a.data.series!.order - b.data.series!.order
+  );
 }
 
-const seriesPosts = allPosts
-  .filter(p => p.frontmatter.series?.name === series?.name)
-  .map(p => ({
-    frontmatter: {
-      title: p.frontmatter.title,
-      series: p.frontmatter.series,
-    },
-    slug:
-      (p.url?.split("/").pop() ||
-        p.file.split("/").pop()?.replace(/\.md$/, "")) ??
-      "",
-  })) as SeriesPost[];
+const currentPostIndex = seriesPosts.findIndex(p => p.slug === post.slug);
+const prevPost =
+  currentPostIndex > 0 ? seriesPosts[currentPostIndex - 1] : null;
+const nextPost =
+  currentPostIndex < seriesPosts.length - 1
+    ? seriesPosts[currentPostIndex + 1]
+    : null;
 ---
 
 <Layout
@@ -65,14 +68,6 @@ const seriesPosts = allPosts
   ogImage={ogUrl}
   canonicalURL={canonicalURL}
 >
-  <Fragment slot="head">
-    <!-- Twitter Card data -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content={SITE.twitterHandle} />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImageUrl} />
-  </Fragment>
   <Header />
   <div class="mx-auto flex w-full max-w-3xl justify-start px-2">
     <button
@@ -96,25 +91,58 @@ const seriesPosts = allPosts
     />
     {
       series && seriesPosts.length > 1 && (
-        <Series
-          series={series}
-          currentSlug={post.slug}
-          posts={seriesPosts}
-          client:load
-        />
+        <nav class="series-nav">
+          <h2 class="series-title">{series.name} Series</h2>
+          <ul class="series-posts">
+            {seriesPosts.map(seriesPost => (
+              <li class={seriesPost.slug === post.slug ? "current-post" : ""}>
+                {seriesPost.slug === post.slug ? (
+                  <span>{seriesPost.data.title}</span>
+                ) : (
+                  <a href={`/posts/${seriesPost.slug}/`}>
+                    {seriesPost.data.title}
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
+        </nav>
       )
     }
     <article id="article" role="article" class="prose mx-auto mt-8 max-w-3xl">
       <Content />
     </article>
 
+    {
+      series && seriesPosts.length > 1 && (
+        <nav class="mt-8 flex justify-between">
+          {prevPost && (
+            <a
+              href={`/posts/${prevPost.slug}/`}
+              class="text-skin-accent hover:underline"
+            >
+              ← {prevPost.data.title}
+            </a>
+          )}
+          {nextPost && (
+            <a
+              href={`/posts/${nextPost.slug}/`}
+              class="ml-auto text-skin-accent hover:underline"
+            >
+              {nextPost.data.title} →
+            </a>
+          )}
+        </nav>
+      )
+    }
+
     <ShareLinks url={postUrl} text={title} />
 
     {
       tags && tags.length > 0 && (
         <ul class="tags-container">
-          {(tags as string[]).map((tag: string) => (
-            <Tag name={tag} slug={slugifyStr(tag)} />
+          {tags.map(tag => (
+            <Tag name={tag} />
           ))}
         </ul>
       )
@@ -132,6 +160,21 @@ const seriesPosts = allPosts
   }
   .tags-container {
     @apply my-8;
+  }
+  .series-nav {
+    @apply my-8 border-l-4 border-skin-accent pl-4;
+  }
+  .series-title {
+    @apply mb-2 text-lg font-medium text-skin-base;
+  }
+  .series-posts {
+    @apply list-none space-y-1;
+  }
+  .series-posts a {
+    @apply text-skin-base hover:text-skin-accent;
+  }
+  .series-posts .current-post {
+    @apply font-medium text-skin-accent;
   }
 </style>
 
